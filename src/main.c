@@ -28,6 +28,7 @@
 #include "task.h"
 
 #include <pico/stdlib.h>
+#include <pico/bootrom.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -70,6 +71,9 @@ void dap_thread(void *ptr)
     do {
         if (tud_vendor_available()) {
             tud_vendor_read(RxDataBuffer, sizeof(RxDataBuffer));
+            if (RxDataBuffer[0] == ID_DAP_Vendor0) {
+                reset_usb_boot(0, 0);
+            }
             resp_len = DAP_ProcessCommand(RxDataBuffer, TxDataBuffer);
             tud_vendor_write(TxDataBuffer, resp_len);
         } else {
